@@ -139,3 +139,4 @@ Then just run docker-compose up -d Go to pma and create both databases, for site
 * http://drupal2.docker.localhost:8000/ (Drupal site 2)
 * http://pma.drupal1.docker.localhost:8000/ (PHPMYADMIN site)
 * http://portainer.drupal1.docker.localhost:8000/ (Portainer)
+### You may need to login to Mysql shell to create the 2nd database U: root/password
