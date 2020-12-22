@@ -789,4 +789,4 @@ $databases['default']['default'] = array (
   'namespace' => 'Drupal\\Core\\Database\\Driver\\mysql',
   'driver' => 'mysql',
 );
-$settings['config_sync_directory'] = 'sites/drupal1.docker.localhost/files/config_wv_U7C7QLilQtvxm1gOTmtqDvxerQ0n61kBYqteoDGbF1SvFBwZV6ZGjyDdr4IA8zyfftRc_Xw/sync';
+$settings['config_sync_directory'] = 'sites/drupal1.docker.localhost/files/config/sync';

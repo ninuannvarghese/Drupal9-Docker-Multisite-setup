@@ -33,3 +33,4 @@ node_modules
 
 # Ignore the php twig storage location
 /storage/
+/.gitattributes
