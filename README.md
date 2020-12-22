@@ -1,137 +1,142 @@
-# Composer template for Drupal projects
+# Docker-based Drupal stack
 
-[![Build Status](https://travis-ci.org/drupal-composer/drupal-project.svg?branch=9.x)](https://travis-ci.org/drupal-composer/drupal-project)
+[![Build Status](https://github.com/wodby/docker4drupal/workflows/Run%20tests/badge.svg)](https://github.com/wodby/docker4drupal/actions)
 
-This project template provides a starter kit for managing your site
-dependencies with [Composer](https://getcomposer.org/).
+## Introduction
 
-## Usage
+Docker4Drupal is a set of docker images optimized for Drupal. Use `docker-compose.yml` file from the [latest stable release](https://github.com/wodby/docker4drupal/releases) to spin up local environment on Linux, Mac OS X and Windows. 
 
-First you need to [install Composer](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-osx).
+* Read the docs on [**how to use**](https://wodby.com/docs/stacks/drupal/local#usage)
+* Ask questions on [Slack](http://slack.wodby.com/)
+* Follow [@wodbycloud](https://twitter.com/wodbycloud) for future announcements
 
-> Note: The instructions below refer to the [global Composer installation](https://getcomposer.org/doc/00-intro.md#globally).
-You might need to replace `composer` with `php composer.phar` (or similar)
-for your setup.
+## Stack
 
-After that you can create the project:
+The Drupal stack consist of the following containers:
 
-```
-composer create-project drupal-composer/drupal-project:9.x-dev some-dir --no-interaction
-```
+| Container       | Versions               | Service name    | Image                              | Default |
+| --------------  | ---------------------- | --------------- | ---------------------------------- | ------- |
+| [Nginx]         | 1.19, 1.18             | `nginx`         | [wodby/nginx]                      | ✓       |
+| [Apache]        | 2.4                    | `apache`        | [wodby/apache]                     |         |
+| [Drupal]        | 9, 8, 7                | `php`           | [wodby/drupal]                     | ✓       |
+| [PHP]           | 8.0, 7.4, 7.3          | `php`           | [wodby/drupal-php]                 |         |
+| Crond           |                        | `crond`         | [wodby/drupal-php]                 | ✓       |
+| [MariaDB]       | 10.5, 10.4, 10.3, 10.2 | `mariadb`       | [wodby/mariadb]                    | ✓       |
+| [PostgreSQL]    | 12, 11, 10, 9.x        | `postgres`      | [wodby/postgres]                   |         |
+| [Redis]         | 6, 5                   | `redis`         | [wodby/redis]                      |         |
+| [Memcached]     | 1                      | `memcached`     | [wodby/memcached]                  |         |
+| [Varnish]       | 6.0, 4.1               | `varnish`       | [wodby/varnish]                    |         |
+| [Node.js]       | 14, 12, 10             | `node`          | [wodby/node]                       |         |
+| [Drupal node]   | 1.0                    | `drupal-node`   | [wodby/drupal-node]                |         |
+| [Solr]          | 8, 7, 6, 5             | `solr`          | [wodby/solr]                       |         |
+| [Elasticsearch] | 7, 6                   | `elasticsearch` | [wodby/elasticsearch]              |         |
+| [Kibana]        | 7, 6                   | `kibana`        | [wodby/kibana]                     |         |
+| [OpenSMTPD]     | 6.0                    | `opensmtpd`     | [wodby/opensmtpd]                  |         |
+| [Mailhog]       | latest                 | `mailhog`       | [mailhog/mailhog]                  | ✓       |
+| [AthenaPDF]     | 2.16.0                 | `athenapdf`     | [arachnysdocker/athenapdf-service] |         |
+| [Rsyslog]       | latest                 | `rsyslog`       | [wodby/rsyslog]                    |         |
+| [Blackfire]     | latest                 | `blackfire`     | [blackfire/blackfire]              |         |
+| [Webgrind]      | 1                      | `webgrind`      | [wodby/webgrind]                   |         |
+| [Xhprof viewer] | latest                 | `xhprof`        | [wodby/xhprof]                     |         |
+| Adminer         | 4.6                    | `adminer`       | [wodby/adminer]                    |         |
+| phpMyAdmin      | latest                 | `pma`           | [phpmyadmin/phpmyadmin]            |         |
+| Selenium chrome | 3.141                  | `chrome`        | [selenium/standalone-chrome]       |         |
+| Portainer       | latest                 | `portainer`     | [portainer/portainer]              | ✓       |
+| Traefik         | latest                 | `traefik`       | [_/traefik]                        | ✓       |
 
-With `composer require ...` you can download new dependencies to your
-installation.
+Supported Drupal versions: 9 / 8 / 7
 
-```
-cd some-dir
-composer require drupal/devel
-```
+## Documentation
 
-The `composer create-project` command passes ownership of all files to the
-project that is created. You should create a new Git repository, and commit
-all files not excluded by the `.gitignore` file.
+Full documentation is available at https://wodby.com/docs/stacks/drupal/local.
 
-## What does the template do?
+## Images' tags
 
-When installing the given `composer.json` some tasks are taken care of:
+Images tags format is `[VERSION]-[STABILITY_TAG]` where:
 
-* Drupal will be installed in the `web`-directory.
-* Autoloader is implemented to use the generated composer autoloader in `vendor/autoload.php`,
-  instead of the one provided by Drupal (`web/vendor/autoload.php`).
-* Modules (packages of type `drupal-module`) will be placed in `web/modules/contrib/`
-* Theme (packages of type `drupal-theme`) will be placed in `web/themes/contrib/`
-* Profiles (packages of type `drupal-profile`) will be placed in `web/profiles/contrib/`
-* Creates default writable versions of `settings.php` and `services.yml`.
-* Creates `web/sites/default/files`-directory.
-* Latest version of drush is installed locally for use at `vendor/bin/drush`.
-* Latest version of DrupalConsole is installed locally for use at `vendor/bin/drupal`.
-* Creates environment variables based on your .env file. See [.env.example](.env.example).
+`[VERSION]` is the _version of an application_ (without patch version) running in a container, e.g. `wodby/nginx:1.15-x.x.x` where Nginx version is `1.15` and `x.x.x` is a stability tag. For some images we include both major and minor version like PHP `7.2`, for others we include only major like Redis `5`. 
 
-## Updating Drupal Core
+`[STABILITY_TAG]` is the _version of an image_ that corresponds to a git tag of the image repository, e.g. `wodby/mariadb:10.2-3.3.8` has MariaDB `10.2` and stability tag [`3.3.8`](https://github.com/wodby/mariadb/releases/tag/3.3.8). New stability tags include patch updates for applications and image's fixes/improvements (new env vars, orchestration actions fixes, etc). Stability tag changes described in the corresponding a git tag description. Stability tags follow [semantic versioning](https://semver.org/).
 
-This project will attempt to keep all of your Drupal Core files up-to-date; the
-project [drupal/core-composer-scaffold](https://github.com/drupal/core-composer-scaffold)
-is used to ensure that your scaffold files are updated every time drupal/core is
-updated. If you customize any of the "scaffolding" files (commonly `.htaccess`),
-you may need to merge conflicts if any of your modified files are updated in a
-new release of Drupal core.
+We highly encourage to use images only with stability tags.
 
-Follow the steps below to update your core files.
+## Maintenance
 
-1. Run `composer update drupal/core-recommended drupal/core-dev --with-dependencies` to update Drupal Core and its dependencies.
-2. Run `git diff` to determine if any of the scaffolding files have changed.
-   Review the files for any changes and restore any customizations to
-  `.htaccess` or `robots.txt`.
-1. Commit everything all together in a single commit, so `web` will remain in
-   sync with the `core` when checking out branches or running `git bisect`.
-1. In the event that there are non-trivial conflicts in step 2, you may wish
-   to perform these steps on a branch, and use `git merge` to combine the
-   updated core files with your customized files. This facilitates the use
-   of a [three-way merge tool such as kdiff3](http://www.gitshah.com/2010/12/how-to-setup-kdiff-as-diff-tool-for-git.html). This setup is not necessary if your changes are simple;
-   keeping all of your modifications at the beginning or end of the file is a
-   good strategy to keep merges easy.
+We regularly update images used in this stack and release them together, see [releases page](https://github.com/wodby/docker4drupal/releases) for full changelog and update instructions. Most of routine updates for images and this project performed by [the bot](https://github.com/wodbot) via scripts located at [wodby/images](https://github.com/wodby/images).
 
-## FAQ
+## Beyond local environment
 
-### Should I commit the contrib modules I download?
+Docker4Drupal is a project designed to help you spin up local environment with docker-compose. If you want to deploy a consistent stack with orchestrations to your own server, check out [Drupal stack](https://wodby.com/stacks/drupal) on Wodby ![](https://www.google.com/s2/favicons?domain=wodby.com).
 
-Composer recommends **no**. They provide [argumentation against but also
-workrounds if a project decides to do it anyway](https://getcomposer.org/doc/faqs/should-i-commit-the-dependencies-in-my-vendor-directory.md).
+## Other Docker4x projects
 
-### Should I commit the scaffolding files?
+* [docker4php](https://github.com/wodby/docker4php)
+* [docker4wordpress](https://github.com/wodby/docker4wordpress)
+* [docker4ruby](https://github.com/wodby/docker4ruby)
+* [docker4python](https://github.com/wodby/docker4python)
 
-The [Drupal Composer Scaffold](https://github.com/drupal/core-composer-scaffold)
-plugin can download the scaffold files (like index.php, update.php, …) to the
-web/ directory of your project. If you have not customized those files you could
-choose to not check them into your version control system (e.g. git). If that is
-the case for your project it might be convenient to automatically run the
-drupal-scaffold plugin after every install or update of your project. You can
-achieve that by registering `@composer drupal:scaffold` as post-install and
-post-update command in your composer.json:
+## License
 
-```json
-"scripts": {
-    "post-install-cmd": [
-        "@composer drupal:scaffold",
-        "..."
-    ],
-    "post-update-cmd": [
-        "@composer drupal:scaffold",
-        "..."
-    ]
-},
-```
+This project is licensed under the MIT open source license.
 
-### How can I apply patches to downloaded modules?
+[Apache]: https://wodby.com/docs/stacks/drupal/containers#apache
+[AthenaPDF]: https://wodby.com/docs/stacks/drupal/containers#athenapdf
+[Blackfire]: https://wodby.com/docs/stacks/drupal/containers#blackfire
+[Drupal node]: https://wodby.com/docs/stacks/drupal/containers#drupal-nodejs
+[Drupal]: https://wodby.com/docs/stacks/drupal/containers#php
+[Elasticsearch]: https://wodby.com/docs/stacks/elasticsearch
+[Kibana]: https://wodby.com/docs/stacks/elasticsearch
+[Mailhog]: https://wodby.com/docs/stacks/drupal/containers#mailhog
+[MariaDB]: https://wodby.com/docs/stacks/drupal/containers#mariadb
+[Memcached]: https://wodby.com/docs/stacks/drupal/containers#memcached
+[Nginx]: https://wodby.com/docs/stacks/drupal/containers#nginx
+[Node.js]: https://wodby.com/docs/stacks/drupal/containers#nodejs
+[OpenSMTPD]: https://wodby.com/docs/stacks/drupal/containers#opensmtpd
+[PHP]: https://wodby.com/docs/stacks/drupal/containers#php
+[PostgreSQL]: https://wodby.com/docs/stacks/drupal/containers#postgresql
+[Redis]: https://wodby.com/docs/stacks/drupal/containers#redis
+[Rsyslog]: https://wodby.com/docs/stacks/drupal/containers#rsyslog
+[Solr]: https://wodby.com/docs/stacks/drupal/containers#solr
+[Varnish]: https://wodby.com/docs/stacks/drupal/containers#varnish
+[Webgrind]: https://wodby.com/docs/stacks/drupal/containers#webgrind
+[XHProf viewer]: https://wodby.com/docs/stacks/php/containers#xhprof-viewer
 
-If you need to apply patches (depending on the project being modified, a pull
-request is often a better solution), you can do so with the
-[composer-patches](https://github.com/cweagans/composer-patches) plugin.
+[_/traefik]: https://hub.docker.com/_/traefik
+[arachnysdocker/athenapdf-service]: https://hub.docker.com/r/arachnysdocker/athenapdf-service
+[blackfire/blackfire]: https://hub.docker.com/r/blackfire/blackfire
+[mailhog/mailhog]: https://hub.docker.com/r/mailhog/mailhog
+[phpmyadmin/phpmyadmin]: https://hub.docker.com/r/phpmyadmin/phpmyadmin
+[portainer/portainer]: https://hub.docker.com/r/portainer/portainer
+[selenium/standalone-chrome]: https://hub.docker.com/r/selenium/standalone-chrome
+[wodby/adminer]: https://hub.docker.com/r/wodby/adminer
+[wodby/apache]: https://github.com/wodby/apache
+[wodby/drupal-node]: https://github.com/wodby/drupal-node
+[wodby/drupal-php]: https://github.com/wodby/drupal-php
+[wodby/drupal]: https://github.com/wodby/drupal
+[wodby/elasticsearch]: https://github.com/wodby/elasticsearch
+[wodby/kibana]: https://github.com/wodby/kibana
+[wodby/mariadb]: https://github.com/wodby/mariadb
+[wodby/memcached]: https://github.com/wodby/memcached
+[wodby/nginx]: https://github.com/wodby/nginx
+[wodby/node]: https://github.com/wodby/node
+[wodby/opensmtpd]: https://github.com/wodby/opensmtpd
+[wodby/postgres]: https://github.com/wodby/postgres
+[wodby/redis]: https://github.com/wodby/redis
+[wodby/rsyslog]: https://hub.docker.com/r/wodby/rsyslog
+[wodby/solr]: https://github.com/wodby/solr
+[wodby/varnish]: https://github.com/wodby/varnish
+[wodby/webgrind]: https://hub.docker.com/r/wodby/webgrind
+[wodby/xhprof]: https://hub.docker.com/r/wodby/xhprof
 
-To add a patch to drupal module foobar insert the patches section in the extra
-section of composer.json:
 
-```json
-"extra": {
-    "patches": {
-        "drupal/foobar": {
-            "Patch description": "URL or local path to patch"
-        }
-    }
-}
-```
+# Local Usage 
+This project has docker configuration for Drupal 9. The .env file contains the docker basic configurations. Docker configurations based on Wodby images, for more information go to: https://github.com/wodby/docker4drupal/
 
-### How do I specify a PHP version ?
+Then just run docker-compose up -d Go to pma and create both databases, for site 1 and for site 2. To run the drupal installations see the bellow links, make sure to use the correct db credentials. If everything went well you're done.
 
-This project supports PHP 7.3 as minimum version (see [Environment requirements of Drupal 9](https://www.drupal.org/docs/understanding-drupal/how-drupal-9-was-made-and-what-is-included/environment-requirements-of)), however it's possible that a `composer update` will upgrade some package that will then require PHP 7.3+.
-
-To prevent this you can add this code to specify the PHP version you want to use in the `config` section of `composer.json`:
-
-```json
-"config": {
-    "sort-packages": true,
-    "platform": {
-        "php": "7.3.19"
-    }
-},
-```
+## URLS:
+* http://drupal1.docker.localhost:8000/ (Drupal site 1)
+* http://drupal2.docker.localhost:8000/ (Drupal site 2)
+* http://pma.drupal1.docker.localhost:8000/ (PHPMYADMIN site)
+* http://portainer.drupal1.docker.localhost:8000/ (Portainer)
+### You may need to login to Mysql shell to create the 2nd database U: root/password
